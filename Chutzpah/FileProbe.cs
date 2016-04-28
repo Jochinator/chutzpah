@@ -7,6 +7,7 @@ using System.Web;
 using Chutzpah.Extensions;
 using Chutzpah.Models;
 using Chutzpah.Wrappers;
+using ServiceStack.Text;
 
 namespace Chutzpah
 {
@@ -262,7 +263,16 @@ namespace Chutzpah
         {
             if (path == null) return null;
 
-            return path.ToLowerInvariant().Replace(@"/", @"\");
+            path = path.ToLowerInvariant().Replace(@"/", @"\");
+            path = path.Split(Path.DirectorySeparatorChar).Aggregate(new List<string>(), (list, item) =>
+            {
+                if (item.Equals(".."))
+                    list.RemoveAt(list.Count-1);
+                else
+                    list.Add(item);
+                return list;
+            }).Join(@"\");
+            return path;
         }
 
         /// <summary>
